@@ -9,22 +9,29 @@ import {
     VStack,
     Flex
 } from "@chakra-ui/react";
-
+import useEth from "../../contexts/EthContext/useEth";
 const AddDegree = () => {
     const [institution, setInstitution] = useState("");
     const [title, setTitle] = useState("");
     const [year, setYear] = useState("");
-
-    const handleSubmit = (e) => {
+    const {
+        state: { contract, accounts },
+    } = useEth();
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Traitez les données du formulaire ici
-        // Vous pouvez par exemple envoyer les données à une API ou les stocker dans un état global
+        try {
+            const result = await contract.methods.createDegree(institution, title, year).send({ from: accounts[0] });
+            console.log('Degree added with ID:', result);
+            alert("Success");
+            setInstitution("");
+            setTitle("");
+            setYear("");
+        } catch (error) {
+            console.log('Error adding degree:', error);
+            alert("Error");
+        }
 
-        // Réinitialisez le formulaire
-        setInstitution("");
-        setTitle("");
-        setYear("");
     };
 
     return (

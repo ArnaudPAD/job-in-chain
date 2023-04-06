@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaEdit, FaTimes } from "react-icons/fa";
 import { Box, VStack, Heading, Text, HStack, StackDivider, Badge, Container, Divider, IconButton } from '@chakra-ui/react';
+import useEth from "../../contexts/EthContext/useEth";
+import utils from '../Utils/utils';
 
-const PersonalInfo = ({ name, email, phone }) => (
+
+const PersonalInfo = ({ name, email, userType }) => (
     <VStack align="start" spacing={2}>
         <Heading size="md">Informations personnelles</Heading>
         <Text>Nom: {name}</Text>
         <Text>Email: {email}</Text>
-        <Text>Téléphone: {phone}</Text>
+        <Text>Status: {userType == 0 ? "Candidat" : "Employeur"}</Text>
     </VStack>
 );
 
@@ -16,16 +19,16 @@ const Experience = ({ experiences, onDelete }) => (
         <Heading size="md" textAlign="center">
             Expériences professionnelles
         </Heading>
-        {experiences.map((exp) => (
-            <Box key={exp.id}>
+        {experiences.map((exp, key) => (
+            <Box key={key}>
 
                 <Text fontWeight="bold">{exp.position}</Text>
                 <HStack justifyContent="space-between" w="100%">
                     <Text>{exp.companyName}</Text>
                     <HStack>
                         <Text>({exp.beginDate} - {exp.endDate || 'En cours'})</Text>
-                        {exp.isVerified && <Badge colorScheme="green">Vérifié</Badge>}
-                        {!exp.isVerified && <Badge colorScheme="red">Pas vérifié</Badge>}
+                        {exp.status == "Valide" && <Badge colorScheme="green">Vérifié</Badge>}
+                        {exp.status == "Pending" && <Badge colorScheme="orange">En attente</Badge>}
                         <IconButton
                             icon={<FaTimes />}
                             aria-label="Supprimer cette expérience"
@@ -41,122 +44,101 @@ const Experience = ({ experiences, onDelete }) => (
         ))}</VStack>
 );
 
-const Diplomas = ({ diplomas, onDelete }) => (
-    <VStack align="start" spacing={2}>
-        <Heading size="md" textAlign="center">Diplômes</Heading>
-        {diplomas.map((diploma) => (
-            <Box key={diploma.id}>
-                <HStack justifyContent="space-between" w="100%">
-                    <Text fontWeight="bold">{diploma.title}</Text>
-                    <HStack>
-                        <Text>{diploma.year}</Text>
-                        {diploma.isVerified && <Badge colorScheme="green">Vérifié</Badge>}
-                        {!diploma.isVerified && <Badge colorScheme="red">Pas vérifié</Badge>}
-                        <IconButton
-                            icon={<FaTimes />}
-                            aria-label="Supprimer ce diplôme"
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => onDelete(diploma.id)}
-                        />
+const Diplomas = ({ diplomas, onDelete }) => {
+    console.log("diplomas", diplomas);
+    return (
+        <VStack align="start" spacing={2}>
+            <Heading size="md" textAlign="center">Diplômes</Heading>
+            {diplomas?.map((diploma, key) => (
+                <Box key={key}>
+                    <HStack justifyContent="space-between" w="100%">
+                        <Text fontWeight="bold">{diploma.title}</Text>
+                        <HStack>
+                            <Text>{diploma.year}</Text>
+                            {diploma.status == "Valide" && <Badge colorScheme="green">Vérifié</Badge>}
+                            {diploma.status == "Pending" && <Badge colorScheme="orange">En Attente</Badge>}
+                            <IconButton
+                                icon={<FaTimes />}
+                                aria-label="Supprimer ce diplôme"
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => onDelete(diploma.id)}
+                            />
+                        </HStack>
                     </HStack>
-                </HStack>
-                <Text>{diploma.institution}</Text>
-                <Divider my={2} />
-            </Box>
-        ))}
-    </VStack>
-);
+                    <Text>{diploma.institution}</Text>
+                    <Divider my={2} />
+                </Box>
+            ))}
+        </VStack>
+    )
+
+}
+
+
+
 
 const Profile = () => {
-    const [personalInfo, setPersonalInfo] = useState({
-        name: "John Doe",
-        email: "john.doe@example.com",
-        phone: "+1 234 567 890",
-    });
+    const [user, setUser] = useState("");
+    const [eventData, setEventData] = useState(null);
 
-    const [experiences, setExperiences] = useState([
-        {
-            id: 1,
-            companyName: "Google",
-            position: "Software Engineer",
-            beginDate: "2018-05-01",
-            endDate: "2020-08-15",
-            description: "Développement d'applications Web et mobiles",
-            isVerified: true,
-        },
-        {
-            id: 1,
-            companyName: "Google",
-            position: "Software Engineer",
-            beginDate: "2018-05-01",
-            endDate: "2020-08-15",
-            description: "Développement d'applications Web et mobiles",
-            isVerified: false,
-        },
-        {
-            id: 1,
-            companyName: "Google",
-            position: "Software Engineer",
-            beginDate: "2018-05-01",
-            endDate: "2020-08-15",
-            description: "Développement d'applications Web et mobiles",
-            isVerified: true,
-        },
-        {
-            id: 1,
-            companyName: "Google",
-            position: "Software Engineer",
-            beginDate: "2018-05-01",
-            endDate: "2020-08-15",
-            description: "Développement d'applications Web et mobiles",
-            isVerified: false,
-        },
-        // ...
-        // Ajoutez d'autres expériences ici
-        // ...
-    ]);
+    const [userDegrees, setUserDegrees] = useState([]);
+    const [userExperiences, setUserExperiences] = useState([]);
 
-    const [diplomas, setDiplomas] = useState([
-        {
-            id: 1,
-            institution: "Université de Paris",
-            title: "Master en Informatique",
-            year: "2017",
-            isVerified: true,
-        },
-        {
-            id: 1,
-            institution: "Université de Paris",
-            title: "Master en Informatique",
-            year: "2017",
-            isVerified: false,
-        },
-        {
-            id: 1,
-            institution: "Université de Paris",
-            title: "Master en Informatique",
-            year: "2017",
-            isVerified: true,
-        },
-        {
-            id: 1,
-            institution: "Université de Paris",
-            title: "Master en Informatique",
-            year: "2017",
-            isVerified: false,
-        },
-        {
-            id: 1,
-            institution: "Université de Paris",
-            title: "Master en Informatique",
-            year: "2017",
-            isVerified: true,
-        },
-        // ...
-        // Ajoutez d'autres diplômes ici
-        // ...
-    ]);
+    const {
+        state: { contract, accounts },
+    } = useEth();
+
+
+    async function getUser() {
+        const getUser = await utils.getUserByAdress(contract, accounts)
+        setPersonalInfo(getUser)
+    };
+
+    async function getUserData() {
+
+
+
+        const getUser = await utils.getUserByAdress(contract, accounts);
+
+
+        const degrees = await contract?.methods?.getUserDegrees(getUser.id).call();
+        const experiences = await contract?.methods?.getUserExperiences(getUser.id).call();
+
+        console.log("degres", degrees);
+        console.log("experiences", experiences);
+
+        const filteredDegrees = degrees.filter(
+            (degree) => degree.status === "Valide" || degree.status === "Pending"
+        );
+        const filteredExperiences = experiences.filter(
+            (experience) => experience.status === "Valide" || experience.status === "Pending"
+        );
+
+        setUserDegrees(filteredDegrees);
+        setUserExperiences(filteredExperiences);
+    }
+
+
+
+
+
+
+    useEffect(() => {
+
+        getUser();
+        getUserData()
+    }, [accounts, contract]);
+
+
+
+
+
+    const [personalInfo, setPersonalInfo] = useState({});
+
+
+
+
 
     return (
         <Container maxW="container.lg">
@@ -165,10 +147,10 @@ const Profile = () => {
                     <PersonalInfo {...personalInfo} />
                 </Box>
                 <Box boxShadow="base" p={5} borderRadius="md" bg="white">
-                    <Experience experiences={experiences} />
+                    <Experience experiences={userExperiences} />
                 </Box>
                 <Box boxShadow="base" p={5} borderRadius="md" bg="white">
-                    <Diplomas diplomas={diplomas} />
+                    <Diplomas diplomas={userDegrees} />
                 </Box>
             </VStack>
         </Container>

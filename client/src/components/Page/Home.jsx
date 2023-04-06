@@ -13,7 +13,7 @@ function Home(props) {
     const [userType, setUserType] = useState("");
     const [user, setUser] = useState("")
     async function checkIfSubscribe() {
-        const user = await utils.getUserByAdress(contract, accounts)
+        const user = await utils.getUserByAdress(contract, accounts);
 
 
         if (user?.email == '') {
@@ -37,9 +37,9 @@ function Home(props) {
     useEffect(() => {
         checkIfSubscribe()
 
-    }, [accounts, user])
+    }, [accounts,])
 
-    console.log("user", user);
+    console.log("user", user?.email );
 
     return (
         <>
@@ -56,7 +56,7 @@ function Home(props) {
                     </Text>
                     <Stack direction="row" spacing={4} mt={8} justify="center">
 
-                        {user?.email == "" ? null : <Link to="/signup"><Button colorScheme="green" size="lg">Créer un profil</Button></Link>}
+                        {!user?.email ? <Link to="/signup"><Button colorScheme="green" size="lg">Créer un profil</Button></Link> : <Link to="/profile"><Button colorScheme="green" size="lg">Votre profil</Button></Link>}
 
                         <Button colorScheme="gray" size="lg">En savoir plus</Button>
                     </Stack>
@@ -77,7 +77,7 @@ function Home(props) {
                     </Box>
                 </Box>
             </Container>
-            );
+            
         </>
     );
 };

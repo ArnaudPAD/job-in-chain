@@ -20,7 +20,7 @@ function Navbar(props) {
 
     const navigate = useNavigate()
     const { owner, accounts } = props;
-
+    console.log("owner", owner);
     const address = accounts ? accounts[0] : null;
 
     console.log("address", accounts);

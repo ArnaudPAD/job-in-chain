@@ -56,12 +56,12 @@ const utils = {
       if (
         await contract.methods.getUserByAddress(accounts[0]).call({ from: accounts[0] })
       ) {
-        console.log("hihio");
+
         let voter = await contract.methods
           .getUserByAddress(accounts[0])
           .call({ from: accounts[0] });
 
-
+        console.log("hihio", voter);
         return voter
 
       } else {

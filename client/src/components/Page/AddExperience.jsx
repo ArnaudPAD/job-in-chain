@@ -10,6 +10,7 @@ import {
     VStack,
     Flex
 } from "@chakra-ui/react";
+import useEth from "../../contexts/EthContext/useEth";
 
 const AddExperience = () => {
     const [companyName, setCompanyName] = useState("");
@@ -17,19 +18,25 @@ const AddExperience = () => {
     const [beginDate, setBeginDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [description, setDescription] = useState("");
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        // Traitez les données du formulaire ici
-        // Vous pouvez par exemple envoyer les données à une API ou les stocker dans un état global
-
-        // Réinitialisez le formulaire
-        setCompanyName("");
-        setPosition("");
-        setBeginDate("");
-        setEndDate("");
-        setDescription("");
+    const {
+        state: { contract, accounts },
+    } = useEth();
+    const handleSubmit = async (e) => {
+        try {
+            e.preventDefault();
+            const result = await contract.methods.createExperience(companyName, position, beginDate, endDate, description).send({ from: accounts[0] });
+            console.log('Degree added with ID:', result);
+            alert("Success");
+            // Réinitialisez le formulaire
+            setCompanyName("");
+            setPosition("");
+            setBeginDate("");
+            setEndDate("");
+            setDescription("");
+        } catch (error) {
+            console.log('Error adding degree:', error);
+            alert("Error");
+        }
     };
     return (
         <Flex
