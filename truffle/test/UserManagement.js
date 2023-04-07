@@ -210,7 +210,7 @@ contract("UserManagement", ([owner, addr1, addr2]) => {
       await userManagement.verifyExperience(experienceId, { from: owner });
       const experiences = await userManagement.getUserExperiences(experienceId);
       expect(experiences.length).to.equal(1);
-      console.log("lalal", experiences[0].status);
+
       expect(experiences[0].status).to.equal("Valide"); // Change "Valide" to "Verified"
     });
   });

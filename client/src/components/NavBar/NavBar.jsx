@@ -8,16 +8,17 @@ import {
     MenuButton,
     MenuList,
     MenuItem,
+    Badge, IconButton
 } from "@chakra-ui/react";
 import "./style.css"
 import logo from "../../assets/logo.png";
+import { BiBell } from "react-icons/bi";
 
 import { useNavigate, Link as Links } from "react-router-dom";
 
 
 
 function Navbar(props) {
-
     const navigate = useNavigate()
     const { owner, accounts } = props;
     console.log("owner", owner);
@@ -103,7 +104,34 @@ function Navbar(props) {
                         </MenuItem>
                     </MenuList>
                 </Menu>
-
+                <Menu>
+                    <MenuButton as={IconButton} icon={<BiBell />} variant="ghost" />
+                    <Badge
+                        position="absolute"
+                        fontSize="0.65em"
+                        backgroundColor="red"
+                        color="white"
+                        borderRadius="50%"
+                        top="0"
+                        right="-8px"
+                    >
+                        3
+                    </Badge>
+                    <MenuList>
+                        <MenuItem>
+                            <Link href="#">Notification 1</Link>
+                        </MenuItem>
+                        <MenuItem>
+                            <Link href="#">Notification 2</Link>
+                        </MenuItem>
+                        <MenuItem>
+                            <Link href="#">Notification 3</Link>
+                        </MenuItem>
+                        <MenuItem>
+                            <Link href="#">Voir toutes les notifications</Link>
+                        </MenuItem>
+                    </MenuList>
+                </Menu>
             </Box>
         </Flex>
     );

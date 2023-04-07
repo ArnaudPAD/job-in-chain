@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.19;
 
 import "../node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "../node_modules/@openzeppelin/contracts/utils/Counters.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "./UserManagement.sol";
 
-
-contract JobListings  {
+contract JobListings {
     using Counters for Counters.Counter;
     Counters.Counter private _listingIds;
     struct JobListing {
@@ -39,11 +41,10 @@ contract JobListings  {
     }
 }
 
-contract JobListingsNFT is ERC721 {
+contract JobListingsManagement is ERC721URIStorage, UserManagement {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     JobListings private _jobListings;
-    mapping(uint256 => JobListings.JobListing) private _listings;
 
     struct JobApplication {
         uint256 applicationId;
@@ -58,12 +59,50 @@ contract JobListingsNFT is ERC721 {
 
     IERC20 private _token;
 
+    event JobApplicationCreated(
+        uint256 indexed applicationId,
+        uint256 indexed tokenId,
+        address indexed candidate
+    );
+
+    event CandidateHired(
+        uint256 indexed tokenId,
+        uint256 indexed applicationId
+    );
+
+    event CandidateRejected(
+        uint256 indexed tokenId,
+        uint256 indexed applicationId
+    );
+
     constructor(
         address jobListingsContractAddress,
         address tokenAddress
     ) ERC721("JobListingsNFT", "JLN") {
         _jobListings = JobListings(jobListingsContractAddress);
         _token = IERC20(tokenAddress);
+    }
+
+    function uint2str(uint256 _i) internal pure returns (string memory str) {
+        if (_i == 0) {
+            return "0";
+        }
+        uint256 j = _i;
+        uint256 length;
+        while (j != 0) {
+            length++;
+            j /= 10;
+        }
+        bytes memory bstr = new bytes(length);
+        uint256 k = length;
+        while (_i != 0) {
+            k = k - 1;
+            uint8 temp = (48 + uint8(_i - (_i / 10) * 10));
+            bytes1 b1 = bytes1(temp);
+            bstr[k] = b1;
+            _i /= 10;
+        }
+        str = string(bstr);
     }
 
     function createJobListingNFT(uint256 listingId) public returns (uint256) {
@@ -87,42 +126,17 @@ contract JobListingsNFT is ERC721 {
                 )
             )
         );
-        _listings[newTokenId] = listing;
+
         return newTokenId;
     }
 
     function getJobListing(
         uint256 tokenId
     ) public view returns (JobListings.JobListing memory) {
-        return _listings[tokenId];
+        uint256 listingId = tokenId;
+        return _jobListings.getListing(listingId);
     }
 
-    function applyForJob(uint256 tokenId, string memory message) public {
-        JobListings.JobListing memory listing = _listings[tokenId];
-        require(
-            listing.company != msg.sender,
-            "Employers cannot apply for job listings"
-        );
-
-        JobApplication[] storage applications = _jobApplications[tokenId];
-        uint256 applicationId = applications.length + 1;
-        applications.push(
-            JobApplication(
-                applicationId,
-                tokenId,
-                users[msg.sender].id,
-                message,
-                false,
-                false
-            )
-        );
-
-        emit JobApplicationCreated(
-            applicationId,
-            tokenId,
-            users[msg.sender].id
-        );
-    }
 
     function getJobApplications(
         uint256 tokenId
@@ -132,14 +146,10 @@ contract JobListingsNFT is ERC721 {
 
     function hireCandidate(uint256 tokenId, uint256 applicationId) public {
         JobApplication storage application = _jobApplications[tokenId][
-            applicationId
+            applicationId - 1
         ];
-        require(
-            application.jobListingId == tokenId,
-            "Application does not correspond to the job listing"
-        );
 
-        JobListings.JobListing memory listing = _listings[tokenId];
+        JobListings.JobListing memory listing = getJobListing(tokenId);
         require(
             listing.company == msg.sender,
             "Only companies can hire candidates"
@@ -152,12 +162,9 @@ contract JobListingsNFT is ERC721 {
 
         application.isHired = true;
         uint256 bounty = listing.salary;
+        User memory user = getUserById(application.candidateId);
         require(
-            _token.transferFrom(
-                msg.sender,
-                users[application.candidateId].walletAddress,
-                bounty
-            ),
+            _token.transferFrom(msg.sender, user.walletAddress, bounty),
             "Token transfer failed"
         );
 
@@ -166,14 +173,10 @@ contract JobListingsNFT is ERC721 {
 
     function rejectCandidate(uint256 tokenId, uint256 applicationId) public {
         JobApplication storage application = _jobApplications[tokenId][
-            applicationId
+            applicationId - 1
         ];
-        require(
-            application.jobListingId == tokenId,
-            "Application does not correspond to the job listing"
-        );
 
-        JobListings.JobListing memory listing = _listings[tokenId];
+        JobListings.JobListing memory listing = getJobListing(tokenId);
         require(
             listing.company == msg.sender,
             "Only companies can reject candidates"

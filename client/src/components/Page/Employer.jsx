@@ -16,7 +16,7 @@ import {
     IconButton,
 } from "@chakra-ui/react";
 
-import { ViewIcon, CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import { ViewIcon, CheckIcon, CloseIcon, EmailIcon } from "@chakra-ui/icons";
 
 const JobOffer = ({ offer, onClick }) => (
     <Tr onClick={onClick}>
@@ -40,6 +40,13 @@ const Applicant = ({ applicant, onAccept, onReject }) => (
                     icon={<CheckIcon />}
                     colorScheme="green"
                     onClick={onAccept}
+                    mr={2}
+                />
+                <IconButton
+                    aria-label="Accepter"
+                    icon={<EmailIcon />}
+                    colorScheme="blue"
+                    onClick={() => { alert("Le mail de proposition a bien été envoyé à " + applicant.email) }}
                     mr={2}
                 />
                 <IconButton

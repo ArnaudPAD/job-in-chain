@@ -8,12 +8,13 @@ function Home(props) {
     const navigate = useNavigate();
 
     const {
-        state: { contract, accounts },
+        state: { jobApplicationManagement, jobListings, jobListingsManagement, userManagement, accounts },
     } = useEth();
     const [userType, setUserType] = useState("");
-    const [user, setUser] = useState("")
+    const [user, setUser] = useState("");
+
     async function checkIfSubscribe() {
-        const user = await utils.getUserByAdress(contract, accounts);
+        const user = await utils.getUserByAdress(userManagement, accounts);
 
 
         if (user?.email == '') {
@@ -37,9 +38,11 @@ function Home(props) {
     useEffect(() => {
         checkIfSubscribe()
 
-    }, [accounts,])
+    }, [accounts,]);
 
-    console.log("user", user?.email );
+    console.log("contractdsqdsqdsq", userManagement);
+
+
 
     return (
         <>
@@ -77,7 +80,7 @@ function Home(props) {
                     </Box>
                 </Box>
             </Container>
-            
+
         </>
     );
 };

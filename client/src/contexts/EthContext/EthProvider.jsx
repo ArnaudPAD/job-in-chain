@@ -2,15 +2,21 @@ import React, { useReducer, useCallback, useEffect } from "react";
 import Web3 from "web3";
 import EthContext from "./EthContext";
 import { reducer, actions, initialState } from "./state";
+import JobApplicationManagementJSON from "../../contracts/JobApplicationManagement.json";
+import JobListingsJSON from "../../contracts/JobListings.json";
+import JobListingsManagementJSON from "../../contracts/JobListingsManagement.json";
+import UserManagementJSON from "../../contracts/UserManagement.json";
+
 
 function EthProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const init = useCallback(async artifact => {
-    if (artifact) {
-      const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
-      const accounts = await web3.eth.requestAccounts();
-      const networkID = await web3.eth.net.getId();
+  const init = useCallback(async () => {
+    const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+    const accounts = await web3.eth.requestAccounts();
+    const networkID = await web3.eth.net.getId();
+
+    const loadContract = async (artifact) => {
       const { abi } = artifact;
       let address, contract;
       try {
@@ -19,19 +25,39 @@ function EthProvider({ children }) {
       } catch (err) {
         console.error(err);
       }
-      dispatch({
-        type: actions.init,
-        data: { artifact, web3, accounts, networkID, contract }
-      });
-    }
+      return contract;
+    };
+
+
+    const jobApplicationManagement = await loadContract(JobApplicationManagementJSON);
+    const jobListings = await loadContract(JobListingsJSON);
+    const jobListingsManagement = await loadContract(JobListingsManagementJSON);
+    const userManagement = await loadContract(UserManagementJSON);
+
+
+    dispatch({
+      type: actions.init,
+      data: {
+        web3,
+        accounts,
+        networkID,
+        jobApplicationManagement,
+        jobListings,
+        jobListingsManagement,
+        userManagement,
+      },
+    });
   }, []);
+
 
   const getUserData = useCallback(async () => {
     if (state.contract) {
       try {
+
         const userAddress = state.accounts[0];
         const userData = await state.contract.methods.getUserByAddress(userAddress).call({ from: userAddress });
         console.log("User data:", userData);
+        console.log("icic", state.contract);
       } catch (err) {
         console.error(err);
       }
@@ -39,21 +65,32 @@ function EthProvider({ children }) {
   }, [state]);
 
   useEffect(() => {
-    const tryInit = async () => {
-      try {
-        const artifact = require("../../contracts/UserManagement.json");
-        init(artifact);
-      } catch (err) {
-        console.error(err);
-      }
-    };
+    init();
+  }, []);
 
-    tryInit();
-  }, [init]);
 
   useEffect(() => {
     getUserData();
   }, [state.contract, getUserData]);
+
+  useEffect(() => {
+    if (
+      state.jobApplicationManagement &&
+      state.jobListings &&
+      state.jobListingsManagement &&
+      state.userManagement
+    ) {
+      console.log("JobApplicationManagement:", state.jobApplicationManagement);
+      console.log("JobListings:", state.jobListings);
+      console.log("JobListingsManagement:", state.jobListingsManagement);
+      console.log("UserManagement:", state.userManagement);
+    }
+  }, [
+    state.jobApplicationManagement,
+    state.jobListings,
+    state.jobListingsManagement,
+    state.userManagement,
+  ]);
 
   useEffect(() => {
     const events = ["chainChanged", "accountsChanged"];

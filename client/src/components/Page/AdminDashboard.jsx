@@ -75,7 +75,7 @@ const AdminDashboard = () => {
                 await contract.methods.verifyExperience(experience.id).send({ from: accounts[0] });
                 fetchPendingData();
             } else {
-
+                alert("Error");
                 console.log("fetch", fetch);
             }
 

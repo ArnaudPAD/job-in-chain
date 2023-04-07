@@ -5,10 +5,14 @@ const actions = {
 const initialState = {
   artifact: null,
   web3: null,
-  accounts: null,
+  accounts: [],
   networkID: null,
-  contract: null
+  jobApplicationManagement: null,
+  jobListings: null,
+  jobListingsManagement: null,
+  userManagement: null,
 };
+
 
 const reducer = (state, action) => {
   const { type, data } = action;

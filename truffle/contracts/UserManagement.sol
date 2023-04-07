@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.0 <0.9.0;
+pragma solidity 0.8.19;
 
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 
@@ -18,6 +18,7 @@ contract UserManagement is Ownable {
         string kyc; // KYC pour les entreprises
         string candidateInfo; // Infos spécifiques pour les candidats
         bool isVerified;
+        address walletAddress;
     }
 
     struct Degree {
@@ -42,6 +43,7 @@ contract UserManagement is Ownable {
 
     string public constant PENDING_STATUS = "Pending";
     string public constant VALID_STATUS = "Valide";
+    string public constant REJECTED_STATUS = "Rejected";
     mapping(address => User) private usersByAddress;
     mapping(uint256 => User) private usersById;
     mapping(uint256 => Degree) private degrees;
@@ -70,6 +72,8 @@ contract UserManagement is Ownable {
         string description,
         string status
     );
+    event DegreeRejected(uint256 indexed id);
+    event ExperienceRejected(uint256 indexed id);
 
     event UserCreated(
         uint256 indexed id,
@@ -111,7 +115,8 @@ contract UserManagement is Ownable {
             _companyName,
             _kyc,
             _candidateInfo,
-            false
+            false,
+            msg.sender
         );
         usersByAddress[msg.sender] = user;
         usersById[userIdCounter] = user;
@@ -197,25 +202,62 @@ contract UserManagement is Ownable {
     }
 
     function verifyDegree(uint256 _degreeId) public onlyOwner {
+        // Check if the given _degreeId is within the valid range of existing Degree IDs
         require(
             _degreeId <= degreeIdCounter && _degreeId > 0,
             "Degree ID does not exist"
         );
+
+        // Update the status of the Degree with _degreeId to "Valide"
         degrees[_degreeId].status = VALID_STATUS;
+
+        // Retrieve the Degree from the mapping and create a storage pointer to it
         Degree storage degree = degrees[_degreeId];
-        userDegrees[degree.userId][_degreeId - 1].status = VALID_STATUS;
+
+        // Find the corresponding Degree in the userDegrees mapping
+        uint256 userId = degree.userId;
+        uint256 degreeIndex = 0;
+        for (uint256 i = 0; i < userDegrees[userId].length; i++) {
+            if (userDegrees[userId][i].id == _degreeId) {
+                degreeIndex = i;
+                break;
+            }
+        }
+
+        // Update the status of the Degree in the userDegrees mapping as well
+        userDegrees[userId][degreeIndex].status = VALID_STATUS;
+
+        // Emit an event indicating that the Degree has been verified
         emit DegreeVerified(_degreeId);
     }
 
     function verifyExperience(uint256 _experienceId) public onlyOwner {
+        // Check if the given _experienceId is within the valid range of existing Experience IDs
         require(
             _experienceId <= experienceIdCounter && _experienceId > 0,
             "Experience ID does not exist"
         );
+
+        // Update the status of the Experience with _experienceId to "Valide"
         experiences[_experienceId].status = VALID_STATUS;
+
+        // Retrieve the Experience from the mapping and create a storage pointer to it
         Experience storage experience = experiences[_experienceId];
-        userExperiences[experience.userId][_experienceId - 1]
-            .status = VALID_STATUS;
+
+        // Find the corresponding Experience in the userExperiences mapping
+        uint256 userId = experience.userId;
+        uint256 experienceIndex = 0;
+        for (uint256 i = 0; i < userExperiences[userId].length; i++) {
+            if (userExperiences[userId][i].id == _experienceId) {
+                experienceIndex = i;
+                break;
+            }
+        }
+
+        // Update the status of the Experience in the userExperiences mapping as well
+        userExperiences[userId][experienceIndex].status = VALID_STATUS;
+
+        // Emit an event indicating that the Experience has been verified
         emit ExperienceVerified(_experienceId);
     }
 
@@ -289,5 +331,65 @@ contract UserManagement is Ownable {
             }
         }
         return result;
+    }
+
+    function rejectDegree(uint256 _degreeId) public onlyOwner {
+        // Check if the given _degreeId is within the valid range of existing Degree IDs
+        require(
+            _degreeId <= degreeIdCounter && _degreeId > 0,
+            "Degree ID does not exist"
+        );
+
+        // Update the status of the Degree with _degreeId to "Rejected"
+        degrees[_degreeId].status = REJECTED_STATUS;
+
+        // Retrieve the Degree from the mapping and create a storage pointer to it
+        Degree storage degree = degrees[_degreeId];
+
+        // Find the corresponding Degree in the userDegrees mapping
+        uint256 userId = degree.userId;
+        uint256 degreeIndex = 0;
+        for (uint256 i = 0; i < userDegrees[userId].length; i++) {
+            if (userDegrees[userId][i].id == _degreeId) {
+                degreeIndex = i;
+                break;
+            }
+        }
+
+        // Update the status of the Degree in the userDegrees mapping as well
+        userDegrees[userId][degreeIndex].status = REJECTED_STATUS;
+
+        // Emit an event indicating that the Degree has been rejected
+        emit DegreeRejected(_degreeId);
+    }
+
+    function rejectExperience(uint256 _experienceId) public onlyOwner {
+        // Check if the given _experienceId is within the valid range of existing Experience IDs
+        require(
+            _experienceId <= experienceIdCounter && _experienceId > 0,
+            "Experience ID does not exist"
+        );
+
+        // Update the status of the Experience with _experienceId to "Rejected"
+        experiences[_experienceId].status = REJECTED_STATUS;
+
+        // Retrieve the Experience from the mapping and create a storage pointer to it
+        Experience storage experience = experiences[_experienceId];
+
+        // Find the corresponding Experience in the userExperiences mapping
+        uint256 userId = experience.userId;
+        uint256 experienceIndex = 0;
+        for (uint256 i = 0; i < userExperiences[userId].length; i++) {
+            if (userExperiences[userId][i].id == _experienceId) {
+                experienceIndex = i;
+                break;
+            }
+        }
+
+        // Update the status of the Experience in the userExperiences mapping as well
+        userExperiences[userId][experienceIndex].status = REJECTED_STATUS;
+
+        // Emit an event indicating that the Experience has been rejected
+        emit ExperienceRejected(_experienceId);
     }
 }
