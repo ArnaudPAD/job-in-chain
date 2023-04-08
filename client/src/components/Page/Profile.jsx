@@ -45,7 +45,7 @@ const Experience = ({ experiences, onDelete }) => (
 );
 
 const Diplomas = ({ diplomas, onDelete }) => {
-    console.log("diplomas", diplomas);
+   
     return (
         <VStack align="start" spacing={2}>
             <Heading size="md" textAlign="center">Diplômes</Heading>
@@ -105,8 +105,7 @@ const Profile = () => {
         const degrees = await userManagement?.methods?.getUserDegrees(getUser.id).call();
         const experiences = await userManagement?.methods?.getUserExperiences(getUser.id).call();
 
-        console.log("degres", degrees);
-        console.log("experiences", experiences);
+    
 
         const filteredDegrees = degrees.filter(
             (degree) => degree.status === "Valide" || degree.status === "Pending"

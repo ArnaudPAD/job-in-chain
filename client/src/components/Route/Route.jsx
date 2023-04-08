@@ -40,7 +40,7 @@ function Navigation() {
             if (err) {
                 console.log(err);
             } else {
-                console.log("lalal", result);
+           
                 setUser(result);
             }
         })
@@ -52,7 +52,7 @@ function Navigation() {
     }, [accounts, status]);
 
 
-    console.log("contract", owner)
+
     return (
         <Router>
             <Navbar owner={owner} accounts={accounts} user={user} />

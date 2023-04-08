@@ -25,7 +25,7 @@ const AddExperience = () => {
         try {
             e.preventDefault();
             const result = await contract.methods.createExperience(companyName, position, beginDate, endDate, description).send({ from: accounts[0] });
-            console.log('Degree added with ID:', result);
+            
             alert("Success");
             // Réinitialisez le formulaire
             setCompanyName("");
@@ -34,7 +34,7 @@ const AddExperience = () => {
             setEndDate("");
             setDescription("");
         } catch (error) {
-            console.log('Error adding degree:', error);
+          
             alert("Error");
         }
     };

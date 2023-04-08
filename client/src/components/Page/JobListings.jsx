@@ -13,7 +13,7 @@ const JobListings = () => {
 
 
     const fetchJobs = async () => {
-        console.log("jobListingsMethods", jobListings.methods);
+
         const numJobs = await jobListings.methods.getListingCount().call({ from: accounts[0] });
         const jobList = [];
 
@@ -21,7 +21,7 @@ const JobListings = () => {
             const job = await jobListings.methods.getListing(i).call({ from: accounts[0] });
             jobList.push(job);
         }
-        console.log("JL", jobList);
+
         setJobs(jobList);
     };
 
@@ -31,11 +31,11 @@ const JobListings = () => {
     }, [accounts]);
 
     const onApply = async (job) => {
-        console.log("job", job);
+
         let user = await userManagement.methods.getUserByAddress(userAccount).call({ from: userAccount });
-        console.log(user);
+
         let apply = await jobApplicationManagement.methods.applyForJob(job.tokenId, "Bonjour je souhaite intégrer votre équipe", user.id,).send({ from: userAccount });
-        console.log(apply);
+
     };
 
     const handleApplyClick = (job) => {

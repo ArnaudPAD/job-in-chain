@@ -22,13 +22,13 @@ const AddDegree = () => {
 
         try {
             const result = await contract.methods.createDegree(institution, title, year).send({ from: accounts[0] });
-            console.log('Degree added with ID:', result);
+          
             alert("Success");
             setInstitution("");
             setTitle("");
             setYear("");
         } catch (error) {
-            console.log('Error adding degree:', error);
+           
             alert("Error");
         }
 

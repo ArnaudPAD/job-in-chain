@@ -56,8 +56,8 @@ function EthProvider({ children }) {
 
         const userAddress = state.accounts[0];
         const userData = await state.contract.methods.getUserByAddress(userAddress).call({ from: userAddress });
-        console.log("User data:", userData);
-        console.log("icic", state.contract);
+    
+      
       } catch (err) {
         console.error(err);
       }
@@ -80,10 +80,7 @@ function EthProvider({ children }) {
       state.jobListingsManagement &&
       state.userManagement
     ) {
-      console.log("JobApplicationManagement:", state.jobApplicationManagement);
-      console.log("JobListings:", state.jobListings);
-      console.log("JobListingsManagement:", state.jobListingsManagement);
-      console.log("UserManagement:", state.userManagement);
+    
     }
   }, [
     state.jobApplicationManagement,

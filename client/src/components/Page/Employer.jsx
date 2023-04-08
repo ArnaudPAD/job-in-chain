@@ -56,8 +56,6 @@ const Applicant = ({ key, applicant, userManagement, account, jobApplicationMana
         const degrees = await userManagement?.methods?.getUserDegrees(applicant.candidateId).call();
         const experiences = await userManagement?.methods?.getUserExperiences(applicant.candidateId).call();
 
-        console.log("degres", degrees);
-        console.log("experiences", experiences);
 
         const filteredDegrees = degrees.filter(
             (degree) => degree.status === "Valide"
@@ -65,8 +63,7 @@ const Applicant = ({ key, applicant, userManagement, account, jobApplicationMana
         const filteredExperiences = experiences.filter(
             (experience) => experience.status === "Valide"
         );
-        console.log("fiiiii", filteredDegrees);
-        console.log("feeeeeee", filteredExperiences);
+      
 
 
 
@@ -75,17 +72,15 @@ const Applicant = ({ key, applicant, userManagement, account, jobApplicationMana
     }
 
     async function hireCandidat() {
-        console.log("ici", applicant);
-        console.log("la", info);
+ 
         let hire = await jobApplicationManagement.methods.hireCandidate(applicant.jobListingId, applicant.applicationId, info.walletAddress).send({ from: account })
-        console.log("hire", hire);
+     
     }
 
     async function rejectCandidat() {
-        console.log("ici", applicant);
-        console.log("la", info);
+   
         let hire = await jobApplicationManagement.methods.rejectCandidate(applicant.jobListingId, applicant.applicationId).send({ from: account })
-        console.log("hire", hire);
+ 
     }
 
 
@@ -94,8 +89,7 @@ const Applicant = ({ key, applicant, userManagement, account, jobApplicationMana
     }, [account])
 
     useEffect(() => {
-        console.log("fiiiiiState", dipl);
-        console.log("feeeeeeeState", expe);
+     
     }, [dipl, expe])
 
     return (
@@ -233,7 +227,7 @@ const EmployerDashboard = () => {
     useEffect(() => {
         getAllEmployerOffer()
     }, [accounts])
-    console.log("offers", jobOffers);
+  
     return (
         <Box>
             <Text fontSize="2xl" mb={4}>

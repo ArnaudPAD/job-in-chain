@@ -42,7 +42,7 @@ const utils = {
         // let start = await contract.methods.startProposalsRegistering().send({ from: accounts[0] });
         let status = await contract.methods.owner().call({ from: accounts[0] });
 
-        console.log("owner", status);
+      
         return status;
       }
     } catch (error) {
@@ -52,7 +52,7 @@ const utils = {
 
   getUserByAdress: async (contract, accounts, setVoter) => {
     try {
-      console.log("lalala");
+    
       if (
         await contract.methods.getUserByAddress(accounts[0]).call({ from: accounts[0] })
       ) {
@@ -61,11 +61,11 @@ const utils = {
           .getUserByAddress(accounts[0])
           .call({ from: accounts[0] });
 
-        console.log("hihio", voter);
+   
         return voter
 
       } else {
-        console.log("icici");
+     
       }
     } catch (error) {
       console.log(
@@ -78,13 +78,13 @@ const utils = {
 
   createUser: async (contract, accounts, body) => {
     try {
-      console.log(body);
+   
       if (
         await contract.methods.createUser(0, "a@a.com", "a").call({ from: accounts[0] })
       ) {
         let newUser = contract.methods.createUser(body.role, body.email, body.name)
           .send({ from: accounts[0] });
-        console.log("newUser", newUser);
+      
       }
     } catch (error) {
       console.log(error);

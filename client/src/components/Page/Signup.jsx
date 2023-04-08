@@ -35,7 +35,7 @@ const SignUp = () => {
         try {
             const result = await contract.methods.createUser(userTypeEnum, name, email, companyName, kyc, candidateInfo).send({ from: accounts[0] });
             toast.success('Utilisateur créé avec succès !');
-            console.log('User created with ID:', result);
+           
             alert("Success");
         } catch (error) {
             toast.error('Erreur lors de la création de l\'utilisateur.');

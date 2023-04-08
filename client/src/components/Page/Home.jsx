@@ -21,7 +21,7 @@ function Home(props) {
 
         } else {
 
-            console.log(user?.userType);
+         
             if (user?.userType == "0") {
                 setUserType("Candidate")
             } else if (user?.userType == "1") {
@@ -40,7 +40,7 @@ function Home(props) {
 
     }, [accounts,]);
 
-    console.log("contractdsqdsqdsq", userManagement);
+   
 
 
 

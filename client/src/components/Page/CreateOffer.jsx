@@ -31,7 +31,7 @@ const CreateOffer = (props) => {
         let userAcc = accounts ? accounts[0] : null;
         // Créez l'annonce sur la blockchain
         const createListingTransaction = await jobListings.methods.createListing(jobTitle, description, salary, ipfsHash).send({ from: userAcc });
-        console.log("createListingTransaction", createListingTransaction);
+       
 
         // Récupérez l'événement ListingCreated pour obtenir le listingId
         const listingCreatedEvent = createListingTransaction.events.ListingCreated;
@@ -40,7 +40,7 @@ const CreateOffer = (props) => {
         // Créez l'annonce NFT sur la blockchain en utilisant le listingId et récupérez le tokenID
         const tokenId = await jobListingsManagement.methods.createJobListingNFT(listingId).send({ from: userAcc });
 
-        console.log(tokenId);
+      
     }
 
 
@@ -85,11 +85,7 @@ const CreateOffer = (props) => {
 
             await createJobOffer(res.data.IpfsHash);
 
-            // Envoyer les données vers votre API ou service backend ici
-            console.log('Job Title: ', jobTitle);
-            console.log('Company: ', company);
-            console.log('Location: ', salary);
-            console.log('Description: ', description);
+          
 
 
             // Réinitialiser les entrées du formulaire après la soumission réussie

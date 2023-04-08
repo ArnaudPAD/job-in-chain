@@ -33,7 +33,7 @@ const AdminDashboard = () => {
         try {
             const pendingDegrees = await userManagement.methods.getAllPendingDegrees().call({ from: accounts[0] });
             const pendingExperiences = await userManagement.methods.getAllPendingExperiences().call({ from: accounts[0] });
-            console.log("PD", pendingDegrees);
+         
             setPendingDiplome(pendingDegrees);
             setPendingExperience(pendingExperiences);
         } catch (error) {
@@ -50,7 +50,7 @@ const AdminDashboard = () => {
         let numberDip = diplome.id
         try {
             let result = await userManagement.methods.verifyDegree(numberDip).send({ from: accounts[0] });
-            console.log("r", result);
+        
             fetchPendingData();
         } catch (error) {
             console.error("Erreur lors de l'approbation du diplôme :", error);
@@ -67,7 +67,7 @@ const AdminDashboard = () => {
     };
 
     const approuverExperience = async (experience) => {
-        console.log("experience", experience);
+      
         try {
 
             if (await userManagement.methods.verifyExperience(experience.id).call({ from: accounts[0] })) {
@@ -76,7 +76,7 @@ const AdminDashboard = () => {
                 fetchPendingData();
             } else {
                 alert("Error");
-                console.log("fetch", fetch);
+               
             }
 
 
@@ -122,7 +122,7 @@ const AdminDashboard = () => {
 
                                     <Button onClick={async () => {
                                         let user = await userManagement.methods.getUserById(diplome?.userId).call({ from: accounts[0] });
-                                        console.log("user", user);
+                                      
                                         setSelectedDiplome(user)
                                     }}>
                                         Voir l'utilisateur
@@ -170,7 +170,7 @@ const AdminDashboard = () => {
                                 <Text mb={2}>Date de fin {experience[5]}</Text>
                                 <Button onClick={async () => {
                                     let user = await userManagement.methods.getUserById(experience?.userId).call({ from: accounts[0] });
-                                    console.log("user", user);
+                                 
                                     setSelectedExperience(user)
 
                                 }}>Voir l'utilisateur</Button>

@@ -26,7 +26,7 @@ function Navbar(props) {
 
     const address = accounts ? accounts[0] : null;
 
-    console.log("userdqsdsqdqs", user);
+
     const shortenedAddress = address ? `${address?.slice(0, 5)}...${address.slice(-4)}` : null;
     return (
         <Flex
