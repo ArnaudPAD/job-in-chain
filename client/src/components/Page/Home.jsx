@@ -8,7 +8,7 @@ function Home(props) {
     const navigate = useNavigate();
 
     const {
-        state: { jobApplicationManagement, jobListings, jobListingsManagement, userManagement, accounts },
+        state: { jobApplicationManagement, jobListings, jobListingsManagement, userManagement, accounts, owner },
     } = useEth();
     const [userType, setUserType] = useState("");
     const [user, setUser] = useState("");

@@ -4,10 +4,11 @@ pragma solidity 0.8.19;
 import "./UserManagement.sol";
 import "./JobListings.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract JobApplicationManagement is UserManagement {
     using Counters for Counters.Counter;
-
+    Counters.Counter private _applicationId;
     struct JobApplication {
         uint256 applicationId;
         uint256 jobListingId;
@@ -18,9 +19,10 @@ contract JobApplicationManagement is UserManagement {
     }
 
     mapping(uint256 => JobApplication[]) private _jobApplications;
-
+    event nftTransfert(address sender, address walletAddress, uint256 tokenId);
     IERC20 private _token;
     JobListings private _jobListings;
+    IERC721 private _jobListingsManagement;
 
     event JobApplicationCreated(
         uint256 indexed applicationId,
@@ -38,9 +40,16 @@ contract JobApplicationManagement is UserManagement {
         uint256 indexed applicationId
     );
 
-    constructor(address jobListingsContractAddress, address tokenAddress) {
+    event eventTest(address msgSender, address walletAddress, uint256 tokenId);
+
+    constructor(
+        address jobListingsContractAddress,
+        address tokenAddress,
+        address jobListingsManagementAddress
+    ) {
         _jobListings = JobListings(jobListingsContractAddress);
         _token = IERC20(tokenAddress);
+        _jobListingsManagement = IERC721(jobListingsManagementAddress);
     }
 
     function getJobListing(
@@ -49,22 +58,20 @@ contract JobApplicationManagement is UserManagement {
         return _jobListings.getListing(tokenId);
     }
 
-    function applyForJob(uint256 tokenId, string memory message) public {
-        JobListings.JobListing memory listing = getJobListing(tokenId);
-        require(
-            listing.company != msg.sender,
-            "Employers cannot apply for job listings"
-        );
-
-        User memory user = getUserByAddress(msg.sender);
+    function applyForJob(
+        uint256 tokenId,
+        string memory message,
+        uint256 _userId
+    ) public {
         JobApplication[] storage applications = _jobApplications[tokenId];
-        uint256 applicationId = applications.length + 1;
+        _applicationId.increment();
+        uint256 applicationId = _applicationId.current();
 
         applications.push(
             JobApplication(
                 applicationId,
                 tokenId,
-                user.id,
+                _userId,
                 message,
                 false,
                 false
@@ -80,7 +87,11 @@ contract JobApplicationManagement is UserManagement {
         return _jobApplications[tokenId];
     }
 
-    function hireCandidate(uint256 tokenId, uint256 applicationId) public {
+    function hireCandidate(
+        uint256 tokenId,
+        uint256 applicationId,
+        address walletAddress
+    ) public {
         JobApplication storage application = _jobApplications[tokenId][
             applicationId - 1
         ];
@@ -97,12 +108,17 @@ contract JobApplicationManagement is UserManagement {
         );
 
         application.isHired = true;
-        uint256 bounty = listing.salary;
-        User memory user = getUserById(application.candidateId);
-        require(
-            _token.transferFrom(msg.sender, user.walletAddress, bounty),
-            "Token transfer failed"
-        );
+
+        // Retirer le candidat accepté de la liste des candidats
+        uint256 applicationsLength = _jobApplications[tokenId].length;
+        for (uint256 i = applicationId - 1; i < applicationsLength - 1; i++) {
+            _jobApplications[tokenId][i] = _jobApplications[tokenId][i + 1];
+        }
+        _jobApplications[tokenId].pop();
+
+        // Transférer le NFT au candidat embauché
+        emit eventTest(msg.sender, walletAddress, tokenId);
+        // _jobListingsManagement.transferFrom(msg.sender, walletAddress, tokenId);
 
         emit CandidateHired(tokenId, applicationId);
     }
@@ -124,6 +140,13 @@ contract JobApplicationManagement is UserManagement {
         );
 
         application.isRejected = true;
+
+        // Retirer le candidat accepté de la liste des candidats
+        uint256 applicationsLength = _jobApplications[tokenId].length;
+        for (uint256 i = applicationId - 1; i < applicationsLength - 1; i++) {
+            _jobApplications[tokenId][i] = _jobApplications[tokenId][i + 1];
+        }
+        _jobApplications[tokenId].pop();
 
         emit CandidateRejected(tokenId, applicationId);
     }

@@ -2,8 +2,8 @@
 import AddDegree from "../Page/AddDegree";
 import AddExperience from "../Page/AddExperience";
 import AdminDashboard from "../Page/AdminDashboard";
-import AllJobOffers from "../Page/AllJobOffers";
 import EditProfil from "../Page/EditProfil";
+import CreateOffer from "../Page/CreateOffer";
 import Employer from "../Page/Employer";
 import Home from "../Page/Home";
 import JobListings from "../Page/JobListings";
@@ -21,11 +21,12 @@ function Navigation() {
     const [voter, setVoter] = useState();
     const [status, setStatus] = useState(0);
     const [owner, setOwner] = useState(0);
+    const [user, setUser] = useState(null)
     const {
-        state: { contract, accounts },
+        state: { jobApplicationManagement, jobListings, jobListingsManagement, userManagement, accounts },
     } = useEth();
     function getOwner() {
-        utils.getOwner(contract, accounts).then((result, err) => {
+        utils.getOwner(userManagement, accounts).then((result, err) => {
             if (err) {
                 console.log(err);
             } else {
@@ -33,9 +34,20 @@ function Navigation() {
             }
         });
     }
+
+    function getUser() {
+        utils.getUserByAdress(userManagement, accounts).then((result, err) => {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("lalal", result);
+                setUser(result);
+            }
+        })
+    }
     useEffect(() => {
         // getVoter();
-
+        getUser();
         getOwner();
     }, [accounts, status]);
 
@@ -43,20 +55,20 @@ function Navigation() {
     console.log("contract", owner)
     return (
         <Router>
-            <Navbar owner={owner} accounts={accounts} />
+            <Navbar owner={owner} accounts={accounts} user={user} />
             <div>
                 <Routes>
-                    <Route path="/" element={<Home owner={owner} accounts={accounts} />} />
+                    <Route path="/" element={<Home owner={owner} accounts={accounts} user={user} />} />
                     <Route path="/profile" exact element={<Profile />} />
                     <Route path="/edit-profile" exact element={<EditProfil />} />
                     <Route path="/add-experience" exact element={<AddExperience />} />
                     <Route path="/add-degree" exact element={<AddDegree />} />
                     <Route path="/admin" exact element={<AdminDashboard />} />
                     <Route path="/signup" exact element={<Signup />} />
-                    <Route path="/job-listings" exact element={<JobListings />} />
+
                     <Route path="/employer" exact element={<Employer />} />
-                    <Route path="/all-job-offers" exact element={<AllJobOffers />} />
-                    <Route render={() => <h1>404 Not Found</h1>} />
+                    <Route path="/all-job-offers" exact element={<JobListings />} />
+                    <Route path="/create-offer" exact element={<CreateOffer user={user} />} />
                 </Routes >
             </div>
 

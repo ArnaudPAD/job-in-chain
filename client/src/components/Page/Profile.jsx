@@ -86,12 +86,12 @@ const Profile = () => {
     const [userExperiences, setUserExperiences] = useState([]);
 
     const {
-        state: { contract, accounts },
+        state: { jobApplicationManagement, jobListings, jobListingsManagement, userManagement, accounts, owner },
     } = useEth();
-
+  
 
     async function getUser() {
-        const getUser = await utils.getUserByAdress(contract, accounts)
+        const getUser = await utils.getUserByAdress(userManagement, accounts)
         setPersonalInfo(getUser)
     };
 
@@ -99,11 +99,11 @@ const Profile = () => {
 
 
 
-        const getUser = await utils.getUserByAdress(contract, accounts);
+        const getUser = await utils.getUserByAdress(userManagement, accounts);
 
 
-        const degrees = await contract?.methods?.getUserDegrees(getUser.id).call();
-        const experiences = await contract?.methods?.getUserExperiences(getUser.id).call();
+        const degrees = await userManagement?.methods?.getUserDegrees(getUser.id).call();
+        const experiences = await userManagement?.methods?.getUserExperiences(getUser.id).call();
 
         console.log("degres", degrees);
         console.log("experiences", experiences);
@@ -128,7 +128,7 @@ const Profile = () => {
 
         getUser();
         getUserData()
-    }, [accounts, contract]);
+    }, [accounts, jobApplicationManagement, jobListings, jobListingsManagement, userManagement,]);
 
 
 

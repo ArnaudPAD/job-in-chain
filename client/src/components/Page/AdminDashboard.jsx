@@ -26,13 +26,13 @@ const AdminDashboard = () => {
     const [pendingDiplome, setPendingDiplome] = useState([]);
     const [pendingExperience, setPendingExperience] = useState([""]);
     const {
-        state: { contract, accounts, owner },
+        state: { jobApplicationManagement, jobListings, jobListingsManagement, userManagement, accounts },
     } = useEth();
 
     const fetchPendingData = async () => {
         try {
-            const pendingDegrees = await contract.methods.getAllPendingDegrees().call({ from: accounts[0] });
-            const pendingExperiences = await contract.methods.getAllPendingExperiences().call({ from: accounts[0] });
+            const pendingDegrees = await userManagement.methods.getAllPendingDegrees().call({ from: accounts[0] });
+            const pendingExperiences = await userManagement.methods.getAllPendingExperiences().call({ from: accounts[0] });
             console.log("PD", pendingDegrees);
             setPendingDiplome(pendingDegrees);
             setPendingExperience(pendingExperiences);
@@ -47,9 +47,9 @@ const AdminDashboard = () => {
     }, [accounts]);
 
     const approuverDiplome = async (diplome) => {
-        let numberDip = BigInt(diplome.id);
+        let numberDip = diplome.id
         try {
-            let result = await contract.methods.verifyDegree(numberDip).send({ from: accounts[0] });
+            let result = await userManagement.methods.verifyDegree(numberDip).send({ from: accounts[0] });
             console.log("r", result);
             fetchPendingData();
         } catch (error) {
@@ -59,7 +59,7 @@ const AdminDashboard = () => {
 
     const rejeterDiplome = async (diplome) => {
         try {
-            await contract.methods.rejectDegree(diplome.id).send({ from: accounts[0] });
+            await userManagement.methods.rejectDegree(diplome.id).send({ from: accounts[0] });
             fetchPendingData();
         } catch (error) {
             console.error("Erreur lors du rejet du diplôme :", error);
@@ -70,9 +70,9 @@ const AdminDashboard = () => {
         console.log("experience", experience);
         try {
 
-            if (await contract.methods.verifyExperience(experience.id).call({ from: accounts[0] })) {
+            if (await userManagement.methods.verifyExperience(experience.id).call({ from: accounts[0] })) {
 
-                await contract.methods.verifyExperience(experience.id).send({ from: accounts[0] });
+                await userManagement.methods.verifyExperience(experience.id).send({ from: accounts[0] });
                 fetchPendingData();
             } else {
                 alert("Error");
@@ -87,7 +87,7 @@ const AdminDashboard = () => {
 
     const rejeterExperience = async (experience) => {
         try {
-            await contract.methods.rejectExperience(experience.id).send({ from: accounts[0] });
+            await userManagement.methods.rejectExperience(experience.id).send({ from: accounts[0] });
             fetchPendingData();
         } catch (error) {
             console.error("Erreur lors du rejet de l'expérience :", error);
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
 
 
                                     <Button onClick={async () => {
-                                        let user = await contract.methods.getUserById(diplome?.userId).call({ from: accounts[0] });
+                                        let user = await userManagement.methods.getUserById(diplome?.userId).call({ from: accounts[0] });
                                         console.log("user", user);
                                         setSelectedDiplome(user)
                                     }}>
@@ -169,7 +169,7 @@ const AdminDashboard = () => {
                                 <Text mb={2}>Date de début {experience[4]}</Text>
                                 <Text mb={2}>Date de fin {experience[5]}</Text>
                                 <Button onClick={async () => {
-                                    let user = await contract.methods.getUserById(experience?.userId).call({ from: accounts[0] });
+                                    let user = await userManagement.methods.getUserById(experience?.userId).call({ from: accounts[0] });
                                     console.log("user", user);
                                     setSelectedExperience(user)
 
