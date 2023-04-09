@@ -12,11 +12,13 @@ import {
 import useEth from "../../contexts/EthContext/useEth";
 import { toast } from 'react-toastify';
 
+import { useNavigate, Link as Links } from "react-router-dom";
 
 const SignUp = () => {
+    const navigate = useNavigate();
 
     const {
-        state: { contract, accounts },
+        state: { jobApplicationManagement, jobListings, jobListingsManagement, userManagement, accounts, owner },
     } = useEth();
     const [userType, setUserType] = useState("candidat");
 
@@ -33,12 +35,13 @@ const SignUp = () => {
         const kyc = ''; // TODO: Add KYC info
         const candidateInfo = ''; // TODO: Add candidate info
         try {
-            const result = await contract.methods.createUser(userTypeEnum, name, email, companyName, kyc, candidateInfo).send({ from: accounts[0] });
-            toast.success('Utilisateur créé avec succès !');
-           
+            const result = await userManagement.methods.createUser(userTypeEnum, name, email, companyName, kyc, candidateInfo).send({ from: accounts[0] });
+
+
             alert("Success");
+            navigate("/profile");
         } catch (error) {
-            toast.error('Erreur lors de la création de l\'utilisateur.');
+
             console.log('Error creating user:', error);
             alert("Error");
 

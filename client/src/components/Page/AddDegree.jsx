@@ -10,25 +10,28 @@ import {
     Flex
 } from "@chakra-ui/react";
 import useEth from "../../contexts/EthContext/useEth";
+import { useNavigate, Link as Links } from "react-router-dom";
+
 const AddDegree = () => {
     const [institution, setInstitution] = useState("");
     const [title, setTitle] = useState("");
     const [year, setYear] = useState("");
     const {
-        state: { contract, accounts },
+        state: { jobApplicationManagement, jobListings, jobListingsManagement, userManagement, accounts, owner },
     } = useEth();
+    const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            const result = await contract.methods.createDegree(institution, title, year).send({ from: accounts[0] });
-          
+            const result = await userManagement.methods.createDegree(institution, title, year).send({ from: accounts[0] });
+            navigate("/profile");
             alert("Success");
             setInstitution("");
             setTitle("");
             setYear("");
         } catch (error) {
-           
+            console.log("error", error);
             alert("Error");
         }
 

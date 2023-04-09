@@ -17,14 +17,23 @@ function EthProvider({ children }) {
     const networkID = await web3.eth.net.getId();
 
     const loadContract = async (artifact) => {
+
+      console.log("arti", artifact)
       const { abi } = artifact;
+      console.log("nid", networkID);
+
       let address, contract;
+
+
       try {
         address = artifact.networks[networkID].address;
         contract = new web3.eth.Contract(abi, address);
+        console.log("adddddd", address);
+        console.log("contract", contract)
       } catch (err) {
         console.error(err);
       }
+
       return contract;
     };
 
@@ -56,8 +65,8 @@ function EthProvider({ children }) {
 
         const userAddress = state.accounts[0];
         const userData = await state.contract.methods.getUserByAddress(userAddress).call({ from: userAddress });
-    
-      
+
+
       } catch (err) {
         console.error(err);
       }
@@ -80,7 +89,7 @@ function EthProvider({ children }) {
       state.jobListingsManagement &&
       state.userManagement
     ) {
-    
+
     }
   }, [
     state.jobApplicationManagement,

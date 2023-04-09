@@ -11,7 +11,7 @@ import {
     Flex
 } from "@chakra-ui/react";
 import useEth from "../../contexts/EthContext/useEth";
-
+import { useNavigate, Link as Links } from "react-router-dom";
 const AddExperience = () => {
     const [companyName, setCompanyName] = useState("");
     const [position, setPosition] = useState("");
@@ -19,14 +19,17 @@ const AddExperience = () => {
     const [endDate, setEndDate] = useState("");
     const [description, setDescription] = useState("");
     const {
-        state: { contract, accounts },
+        state: { jobApplicationManagement, jobListings, jobListingsManagement, userManagement, accounts, owner },
     } = useEth();
+
+    const navigate = useNavigate();
     const handleSubmit = async (e) => {
         try {
             e.preventDefault();
-            const result = await contract.methods.createExperience(companyName, position, beginDate, endDate, description).send({ from: accounts[0] });
-            
+            const result = await userManagement.methods.createExperience(companyName, position, beginDate, endDate, description).send({ from: accounts[0] });
+
             alert("Success");
+            navigate("/profile");
             // Réinitialisez le formulaire
             setCompanyName("");
             setPosition("");
@@ -34,7 +37,7 @@ const AddExperience = () => {
             setEndDate("");
             setDescription("");
         } catch (error) {
-          
+            console.log(error);
             alert("Error");
         }
     };
