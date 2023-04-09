@@ -154,6 +154,6 @@ module.exports = async function (deployer, network, accounts) {
 
   // console.log("UserManagement address:", userManagementInstance.address);
   // console.log("JobListings address:", jobListingsInstance.address);
-  // console.log("JobListingsManagement address:", jobListingsManagementInstance.address);
+  console.log("JobListingsManagement address:", jobListingsManagementInstance.address);
   // console.log("JobApplicationManagement address:", jobApplicationManagementInstance.address);
 };
